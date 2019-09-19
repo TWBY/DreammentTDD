@@ -7,10 +7,10 @@ public class ObjectReaction : MonoBehaviour
     TimeCountDown Timer;
     float IvanDisappearTime = 2.0f;
     float ResetTheTime;
-
     Move move;
 
-    public GameObject CubePrefab;
+
+    // public GameObject CubePrefab;
 
     private string ToyTag;
     private int ToyIndex = 0;
@@ -62,7 +62,8 @@ public class ObjectReaction : MonoBehaviour
     public void generateToy()
     {
         Debug.Log("genetator the toy");
-        GameObject cube = Instantiate(CubePrefab, ToyPosition[ToyIndex], new Quaternion(0, 0, 0, 0));
+        GameObject cube = Instantiate(Resources.Load("Toy"), ToyPosition[ToyIndex], new Quaternion(0, 0, 0, 0)) as GameObject;
+
         cube.AddComponent<ToyOne>();
         cube.tag = "toy" + TagIndex;
 
@@ -70,3 +71,4 @@ public class ObjectReaction : MonoBehaviour
         TagIndex++;
     }
 }
+
