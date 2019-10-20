@@ -11,8 +11,6 @@ public class addScript : MonoBehaviour
     {
         ButtonTrigger = GameObject.Find("ButtonTrigger");
         ButtonTrigger.AddComponent<Standing>();
-
-        print("test");
     }
 
     // Update is called once per frame
