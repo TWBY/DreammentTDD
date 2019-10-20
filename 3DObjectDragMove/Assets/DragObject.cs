@@ -45,7 +45,7 @@ public class DragObject : MonoBehaviour
         // rb.MovePosition(new Vector3(GetMouseAsWorldPoint().x, transform.position.y, transform.position.z));
         // transform.position = new Vector3(GetMouseAsWorldPoint().x, transform.position.y, transform.position.z);
         transform.position = Vector3.SmoothDamp(transform.position, new Vector3(GetMouseAsWorldPoint().x, transform.position.y, transform.position.z), ref velocity, smoothTime);
-
+        Debug.Log("TouchPosition = " + TouchPosition);
         if (IsTouchBorder)
         {
             Debug.Log("TouchPosition = " + TouchPosition);
