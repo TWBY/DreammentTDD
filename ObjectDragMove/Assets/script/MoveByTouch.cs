@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class MoveByTouch : MonoBehaviour
 {
-
     Rigidbody rb;
     Vector3 touchPoint;
     public GameObject BeTouchObj;
@@ -70,11 +69,13 @@ public class MoveByTouch : MonoBehaviour
             {
                 rb.velocity = Vector3.zero;
                 BeTouchObjectExist = false;
+                BeTouchObj = null;
             }
             if (BeTouchObj.transform.position.x <= StopPosition && rb.velocity.x < 0)
             {
                 rb.velocity = Vector3.zero;
                 BeTouchObjectExist = false;
+                BeTouchObj = null;
             }
         }
     }
