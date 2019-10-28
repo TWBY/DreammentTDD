@@ -8,6 +8,7 @@ public class MoveByTouch : MonoBehaviour
     Rigidbody rb;
     Vector3 touchPoint;
     public GameObject BeTouchObj = null;
+
     public string MoveAxis;
 
     public bool IsTouch = false;
@@ -16,11 +17,16 @@ public class MoveByTouch : MonoBehaviour
     public float HighLimit;
     public float LowLimit;
     float StopPosition;
-    float velocitySpeed = 5;
+    float velocitySpeed = 10;
+
+    private static Vector2 startPos = Vector2.zero;//觸碰起始點
+    private static Vector2 endPos = Vector2.zero;//觸碰結束點
+    private static Vector2 direction = Vector2.zero;//移動方向
 
     void start()
     {
         Application.targetFrameRate = -1;
+        BeTouchObj = GameObject.Find("NullObject");
     }
     void Update()
     {
@@ -32,6 +38,7 @@ public class MoveByTouch : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
+                startPos = touch.position;
                 if (Physics.Raycast(ray, out hit))
                 {
                     BeTouchObj = hit.transform.gameObject;
@@ -50,8 +57,9 @@ public class MoveByTouch : MonoBehaviour
             }
             else if (touch.phase == TouchPhase.Ended && IsTouch == true)
             {
+                direction = touch.position - startPos;
                 touchPoint = WorldToScreenToWorld(BeTouchObj.transform.position);
-                adjustPosition(touchPoint);
+                adjustPosition(touchPoint, direction);
                 IsTouch = false;
             }
 
@@ -69,15 +77,49 @@ public class MoveByTouch : MonoBehaviour
             switch (MoveAxis)
             {
                 case "XAxis":
-                    if ((BeTouchObjPos.x - StopPosition) * rb.velocity.x > 0)
+                    // if ((BeTouchObjPos.x - StopPosition) * rb.velocity.x > 0)
+                    // {
+                    //     rb.velocity = Vector3.zero;
+                    //     Vector3 endPosition = new Vector3(StopPosition, BeTouchObjPos.y, BeTouchObjPos.z);
+                    //     rb.MovePosition(endPosition);
+                    //     BeTouchObjectExist = false;
+                    //     BeTouchObj = GameObject.Find("NullObject");
+                    // }
+                    // Debug.Log("rb.velocity.x = " + rb.velocity.x);
+                    if ((rb.velocity.x < 0 && rb.velocity.x > -0.5) || (rb.velocity.x > 0 && rb.velocity.x < 0.5))//去判定此物體的加速度已經快要歸零
                     {
-                        rb.velocity = Vector3.zero;
-                        Vector3 endPosition = new Vector3(StopPosition, BeTouchObjPos.y, BeTouchObjPos.z);
-                        rb.MovePosition(endPosition);
-                        BeTouchObjectExist = false;
-                        BeTouchObj = null;
+                        StopPosition = Mathf.Round(BeTouchObjPos.x);//判定現在物體所在的位置應該要停到的停止點
+                        // Debug.Log("StopPosition = " + StopPosition);
+
+                        //if (BeTouchObjPos.x < StopPosition)
+                        if ((BeTouchObjPos.x - StopPosition) * rb.velocity.x > 0 && Mathf.Abs(BeTouchObjPos.x - StopPosition) < 0.000000001f)
+                        {
+                            Debug.Log("STOP!!!!!!!!");
+                            rb.velocity = Vector3.zero;
+                            // Vector3 endPosition = new Vector3(StopPosition, BeTouchObjPos.y, BeTouchObjPos.z);
+                            // rb.MovePosition(endPosition);
+                            BeTouchObjectExist = false;
+                            BeTouchObj = GameObject.Find("NullObject");
+                        }
+
+                        if (BeTouchObjPos.x > StopPosition)
+                        {
+                            rb.velocity = -rb.velocity;
+
+                            //if ((BeTouchObjPos.x - StopPosition) * rb.velocity.x > 0 && Mathf.Abs(BeTouchObjPos.x - StopPosition) < 0.000000001f)
+                            if (Mathf.Abs(BeTouchObjPos.x - StopPosition) < 0.000000001f)
+                            {
+                                Debug.Log("STOP!!!!!!!!");
+                                rb.velocity = Vector3.zero;
+                                // Vector3 endPosition = new Vector3(StopPosition, BeTouchObjPos.y, BeTouchObjPos.z);
+                                // rb.MovePosition(endPosition);
+                                BeTouchObjectExist = false;
+                                BeTouchObj = GameObject.Find("NullObject");
+                            }
+                        }
                     }
                     break;
+
                 case "YAxis":
                     if ((BeTouchObjPos.y - StopPosition) * rb.velocity.y > 0)
                     {
@@ -85,7 +127,7 @@ public class MoveByTouch : MonoBehaviour
                         Vector3 endPosition = new Vector3(BeTouchObjPos.x, StopPosition, BeTouchObjPos.z);
                         rb.MovePosition(endPosition);
                         BeTouchObjectExist = false;
-                        BeTouchObj = null;
+                        BeTouchObj = GameObject.Find("NullObject");
                     }
                     break;
 
@@ -96,7 +138,7 @@ public class MoveByTouch : MonoBehaviour
                         Vector3 endPosition = new Vector3(BeTouchObjPos.x, BeTouchObjPos.y, StopPosition);
                         rb.MovePosition(endPosition);
                         BeTouchObjectExist = false;
-                        BeTouchObj = null;
+                        BeTouchObj = GameObject.Find("NullObject");
                     }
                     break;
             }
@@ -143,35 +185,43 @@ public class MoveByTouch : MonoBehaviour
         rb.MovePosition(WorldPosition);
     }
 
-    void adjustPosition(Vector3 WorldPosition)
+    void adjustPosition(Vector3 WorldPosition, Vector2 dir)
     {
-
+        Debug.Log("dir = " + dir);
         switch (MoveAxis)
         {
             case "XAxis":
-                Debug.Log("WorldPosition = " + WorldPosition);
-                if (WorldPosition.x >= HighLimit)
-                {
-                    WorldPosition = new Vector3(HighLimit, WorldPosition.y, WorldPosition.z);
-                }
-                if (WorldPosition.x <= LowLimit)
-                {
-                    WorldPosition = new Vector3(LowLimit, WorldPosition.y, WorldPosition.z);
-                }
+                // Debug.Log("WorldPosition = " + WorldPosition);
+                // if (WorldPosition.x >= HighLimit)
+                // {
+                //     WorldPosition = new Vector3(HighLimit, WorldPosition.y, WorldPosition.z);
+                // }
+                // if (WorldPosition.x <= LowLimit)
+                // {
+                //     WorldPosition = new Vector3(LowLimit, WorldPosition.y, WorldPosition.z);
+                // }
 
-                if (WorldPosition.x % 1 >= 0.5)
+                // if (WorldPosition.x % 1 >= 0.5)
+                // {
+                //     rb.velocity = Vector3.right * velocitySpeed;
+                // }
+                // if (WorldPosition.x % 1 < 0.5)
+                // {
+                //     rb.velocity = Vector3.left * velocitySpeed;
+                // }
+                if (dir.x > 0)
                 {
                     rb.velocity = Vector3.right * velocitySpeed;
                 }
-                if (WorldPosition.x % 1 < 0.5)
+                if (dir.x < 0)
                 {
                     rb.velocity = Vector3.left * velocitySpeed;
                 }
-                StopPosition = Mathf.Round(WorldPosition.x);
+                // StopPosition = Mathf.Round(WorldPosition.x);
                 break;
 
             case "YAxis":
-                Debug.Log("WorldPosition = " + WorldPosition);
+                // Debug.Log("WorldPosition = " + WorldPosition);
                 if (WorldPosition.y >= HighLimit)
                 {
                     WorldPosition = new Vector3(WorldPosition.x, HighLimit, WorldPosition.z);
@@ -189,7 +239,7 @@ public class MoveByTouch : MonoBehaviour
                 {
                     rb.velocity = Vector3.down * velocitySpeed;
                 }
-                StopPosition = Mathf.Round(WorldPosition.y);
+                // StopPosition = Mathf.Round(WorldPosition.y);
                 break;
 
             case "ZAxis":
@@ -210,10 +260,12 @@ public class MoveByTouch : MonoBehaviour
                 {
                     rb.velocity = Vector3.back * velocitySpeed;
                 }
-                StopPosition = Mathf.Round(WorldPosition.z);
+                // StopPosition = Mathf.Round(WorldPosition.z);
                 break;
         }
         BeTouchObjectExist = true;
     }
 }
+
+
 
