@@ -23,7 +23,7 @@ public class MoveByTouch : MonoBehaviour
     private static Vector2 endPos = Vector2.zero;//觸碰結束點
     private static Vector2 direction = Vector2.zero;//移動方向
 
-    void start()
+    void Start()
     {
         Application.targetFrameRate = -1;
         BeTouchObj = GameObject.Find("NullObject");
@@ -39,15 +39,16 @@ public class MoveByTouch : MonoBehaviour
             if (touch.phase == TouchPhase.Began)
             {
                 startPos = touch.position;
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, 9))
                 {
                     BeTouchObj = hit.transform.gameObject;
                 }
 
-                if (BeTouchObj.tag == "Drag")
+                if (hit.transform.tag == "Drag")
                 {
                     rb = BeTouchObj.GetComponent<Rigidbody>();
                     IsTouch = true;
+                    Debug.Log("BeTouchObj.tag = " + BeTouchObj.transform.name);
                     // Debug.Log("Drag");
                 }
             }
